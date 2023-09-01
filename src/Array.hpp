@@ -2,15 +2,19 @@
 #ifndef __ARRAY_HPP_
 #define __ARRAY_HPP_
 
+#include "Properties.hpp"
 #include "Container.hpp"
 #include <initializer_list>
 #include <cassert>
 
 template<typename T , size_t arraySize>
-class Array : public Container<T>, is_subscriptable<T> {
+class Array : public Container<T>, 
+              public subscriptable<T>
+              
+{
 
 /*The size of the array should be provided as a positive integer: */
-static_assert(arraySize != 0);
+static_assert(arraySize != 0 , "Array with size zero is not allowed");
 
 public:
     /*Default Constructor: */
@@ -40,6 +44,27 @@ public:
     Array(Array&&) = default;
     Array& operator=(Array&&) = default;
 
+    /*Array constructor for different sized arrays*/
+    template<size_t otherSize>
+    Array(const Array<T,otherSize>& otherArr){
+        this->operator=(otherArr);
+    }
+
+    /*Array assignment operator for different sized arrays*/
+    template<size_t otherSize>
+    Array& operator=(const Array<T,otherSize>& otherArr){
+        
+        static_assert(arraySize >= otherSize , "Cannot initialize a smaller array with a larger one.");
+        
+        for(size_t i = 0 ; i < otherSize ; i++){
+            this->arr[i] =otherArr[i];
+        }
+
+        return *this;
+    }
+
+
+
     /*Returns the number of elements in a array*/
     size_t size() const override{
         return arraySize;
@@ -53,18 +78,18 @@ public:
     /*Removes all the content of the container*/
     void clear() override{
         for(auto& element: this->arr){
-            element = T{};
+            element = T{}; //TODO: Find a way for this to work with classes that don't have a default constructor.
         }
     }
 
 /*Operators: */
-    /*Subscript Operator: */
-    T& operator[](size_t index) override{
+    /*Subscript Operators: */
+    inline T& operator[](size_t index) override{
         assert(index < arraySize);
         return this->arr[index];
     }
 
-    const T& operator[](size_t index) const override{
+    inline const T& operator[](size_t index) const override{
         assert(index < arraySize);
         return this->arr[index];
     }
@@ -74,14 +99,20 @@ public:
         return this->arr;
     }
 
-    class Iterator : public Container<T>::Iterator{
+    class Iterator : public Container<T>::Iterator , 
+                     public write_accessible<T>
+    {
 
         friend class Array<T,arraySize>;
 
         public:
-            /*Dereference operator: */
-            T operator*() override{
-                return Arr[this->CurrentIndex];
+            /*Dereference operators: */
+            T& operator*() override{
+                return this->Arr[this->CurrentIndex];
+            }
+
+            const T& operator*() const override{
+                return this->Arr[this->CurrentIndex];
             }
 
             /*Increment operators: */
@@ -114,12 +145,12 @@ public:
 
             private:
                 /*A reference to the array to iterate on: */
-                const T (&Arr)[arraySize];
+                T (&Arr)[arraySize];
                 /*An index to point at a particular position in the referenced array*/
                 size_t CurrentIndex{};
 
                 /*Private Constructor to be used by the array class: */
-                Iterator(const T (&arr)[arraySize] , size_t index) : Arr{arr} , CurrentIndex{index}{
+                Iterator(T (&arr)[arraySize] , size_t index) : Arr{arr} , CurrentIndex{index}{
                 }
         };
 
@@ -127,10 +158,22 @@ public:
         /*Returns an iterator to the first place in the container*/
         Array<T,arraySize>::Iterator begin(){
             return Array<T,arraySize>::Iterator{arr,0};
+            
         }
 
         /*Returns an iterator to following the last place in the container*/
         Array<T,arraySize>::Iterator end(){
+            return Array<T,arraySize>::Iterator{arr,arraySize};
+           
+        }
+
+        /*Returns an iterator to the first place in the container*/
+        const Array<T,arraySize>::Iterator& begin() const{
+            return Array<T,arraySize>::Iterator{arr,0};
+        }
+
+        /*Returns an iterator to following the last place in the container*/
+        const Array<T,arraySize>::Iterator& end() const{ 
             return Array<T,arraySize>::Iterator{arr,arraySize};
         }
 

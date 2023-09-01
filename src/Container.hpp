@@ -25,7 +25,7 @@ class Container{
 
         public:
             /*Dereference operator: */
-            virtual T operator*() = 0;
+            virtual const T& operator*() const = 0;
 
             /*Increment operators: */
             virtual void operator++() = 0;
@@ -43,16 +43,26 @@ class Container{
         virtual ~Container() = default;
 };
 
+
+/*An interface for containers that provide read only iterators:*/
+template<typename T>
+struct const_iteratable{
+    
+    virtual const typename Container<T>::Iterator& begin() const = 0;
+
+    virtual const typename Container<T>::Iterator& end() const = 0;
+
+};
+
+/*An interface for containers that provide read/write iterators:*/
+template<typename T>
+struct iteratable : const_iteratable<T>{
+    
+    virtual typename Container<T>::Iterator& begin() = 0;
+
+    virtual typename Container<T>::Iterator& end() = 0;
+
+};
+
 #endif
 
-
-/*
- * Description: A class that serves as an interface for containers that implement the subscript operator.
- */
-template<typename T>
-struct is_subscriptable{
-
-    virtual T& operator[](size_t index) = 0 ;    
-
-    virtual const T& operator[](size_t index) const = 0;
-};
