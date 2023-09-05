@@ -4,9 +4,9 @@
 #include "Properties.hpp"
 #include "Container.hpp"
 #include "Array.hpp"
+#include "Config.hpp"
 
-
-template<typename T, size_t maxSize>
+template<typename T, size_t maxSize = defaultMaxVectorSize>
 class Vector : public Container<T>,
                public subscriptable<T>
 {

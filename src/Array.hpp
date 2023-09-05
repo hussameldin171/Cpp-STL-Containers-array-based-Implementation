@@ -4,10 +4,11 @@
 
 #include "Properties.hpp"
 #include "Container.hpp"
+#include "Config.hpp"
 #include <initializer_list>
 #include <cassert>
 
-template<typename T , size_t arraySize>
+template<typename T , size_t arraySize = defaultMaxArraySize>
 class Array : public Container<T>, 
               public subscriptable<T>
               

@@ -2,7 +2,7 @@
 #define __STACK_HPP_
 
 #include "Vector.hpp"
-template<typename T, size_t maxStackSize>
+template<typename T, size_t maxStackSize = defaultMaxStackSize>
 class Stack : public Container<T>{ /*A stack is a container,but not subscriptable, and not iterable*/
 
     /*The maximum size of the stack should be provided as a positive integer: */
