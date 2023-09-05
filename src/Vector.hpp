@@ -103,12 +103,12 @@ class Vector : public Container<T>,
         return this->arr[currentSize];
     }
 
-    inline const T& back() const{
+    inline T back() const{
         assert(currentSize != 0);
         return this->arr[currentSize-1];
     }
 
-    inline const T& front() const{
+    inline T front() const{
         assert(currentSize!=0);
         return this->arr[0];
     }
